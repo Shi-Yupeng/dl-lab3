@@ -27,11 +27,41 @@ class BasicBlock(nn.Module):
         return out
 
 
+# 用于构建ResNet50， ResNet101， ResNet152 由于模型过大训练不一定可行，先不实现
+# class Bottleneck(nn.Module):
+#     def __init__(self, in_channel, out_channel, stride=1):
+#         super(Bottleneck, self).__init__()
+#
+#     def forward(self, x):
+#         return 0
+
+
 class ResNet(nn.Module):
-    def __init__(self, BasicBlock, num_classes=10):
+    def __init__(self, block, num_classes=10):
         super(ResNet, self).__init__()
 
     def _make_layer(self, block, planes, num_blocks, stride):
+        return 0
 
     def forward(self, x):
         return 0
+
+
+def ResNet18():
+    return ResNet(BasicBlock, [2,2,2,2])
+
+
+def ResNet34():
+    return ResNet(BasicBlock, [3,4,6,3])
+
+
+# def ResNet50():
+#     return ResNet(Bottleneck, [3,4,6,3])
+#
+#
+# def ResNet101():
+#     return ResNet(Bottleneck, [3,4,23,3])
+#
+#
+# def ResNet152():
+#     return ResNet(Bottleneck, [3,8,36,3])
