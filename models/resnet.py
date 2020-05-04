@@ -25,9 +25,10 @@ class BasicBlock(nn.Module):
             )
 
     def forward(self, x):
-        out = self.conv1(F.relu(self.norm1(x)))
-        out = self.conv2(F.relu(self.norm2(out)))
-        shortcut = self.shortcut(out)
+        out = F.relu(self.bn1(x))
+        shortcut = self.shortcut(out) if hasattr(self, 'shortcut') else x
+        out = self.conv1(out)
+        out = self.conv2(F.relu(self.bn2(out)))
         out += shortcut
         return out
 
@@ -54,7 +55,7 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
         self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.linear = nn.Linear(512 * 1 * 1, num_classes)
+        self.fc = nn.Linear(512 * 1 * 1, num_classes)
 
     def _make_layer(self, block, out_channel, num_blocks, stride):
         strides = [stride] + [1] * (num_blocks - 1)
@@ -72,7 +73,7 @@ class ResNet(nn.Module):
         out = self.layer4(out)
         out = self.avgpool(out)
         out = out.view(out.size(0), 512 * 1 * 1)
-        out = self.linear(out)
+        out = self.fc(out)
         return out
 
 
