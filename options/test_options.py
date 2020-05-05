@@ -6,3 +6,4 @@ class TestOptions(BaseOptions):
         parser = BaseOptions.initialize(self, parser)
         parser.add_argument('--test_dir', type=str, default='test', help='准确率测试（训练集or测试集）')
         self.isTrain = False
+        return parser
