@@ -16,7 +16,16 @@ class Model():
         self.net = networks.definenet(opt).to(self.device)
         if self.isTrain:
             self.criterion = networks.Criterion().to(self.device)
-            self.optimizer = torch.optim.Adam(self.net.parameters(),lr=opt.lr)
+            optimizers = {"SGD": torch.optim.SGD(self.net.parameters(),
+                                             lr=opt.lr),
+                          "SGD-Momentum": torch.optim.SGD(self.net.parameters(),
+                                                      momentum=0.99,
+                                                      lr=opt.lr),
+                          "RMSProp": torch.optim.RMSprop(self.net.parameters(),
+                                                     alpha=0.9),
+                          'ADAM': torch.optim.Adam(self.net.parameters(),
+                                               lr=opt.lr, betas=(0.9, 0.99))}
+            self.optimizer = optimizers[opt.optimizer]
 
     def initialize(self, opt):
 

@@ -16,5 +16,7 @@ class TrainOptions(BaseOptions):
         parser.add_argument('--continue_train', action='store_true', help=' 是否续训')
         parser.add_argument('--visual_module', type=str, default='./checkpoints/runs/',
                             help='可视化目录')
+        parser.add_argument('--optimizer', type=str, default='ADAM',
+                            help='优化器 [SGD,SGD-Momentum,RMSProp,ADAM]')
         self.isTrain = True
         return parser
