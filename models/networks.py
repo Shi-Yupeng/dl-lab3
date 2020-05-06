@@ -274,7 +274,7 @@ class VGG(nn.Module):
         x = self.classify(x)
         return x
 
-# VGG19_SE网络
+# SEVGG19网络
 class SEVGG(nn.Module):
     def __init__(self):
         super(SEVGG, self).__init__()
