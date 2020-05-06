@@ -33,6 +33,10 @@ class Model():
             if opt.lr_policy == 'step':
                 scheduler = lr_scheduler.StepLR(self.optimizer, step_size=opt.lr_decay_iters, gamma=0.1)
                 self.scheduler = scheduler
+            elif opt.lr_policy == 'plateau':
+                scheduler = lr_scheduler.ReduceLROnPlateau(self.optimizer, mode='min', factor=0.1, threshold=0.01,
+                                                           patience=3)
+                self.scheduler = scheduler
         if not self.isTrain or opt.continue_train:
             self.load_networks(opt.loadepoch)
         self.print_networks()
