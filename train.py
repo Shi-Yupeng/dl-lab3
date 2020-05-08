@@ -22,4 +22,4 @@ if __name__ == "__main__":
         if epoch % opt.save_freq == 0:
             model.save_networks(epoch)
         if opt.lr_policy != 'none' and epoch % opt.lr_decay_iters == 0:
-            model.update_learning_rate()
+            model.update_learning_rate(opt)

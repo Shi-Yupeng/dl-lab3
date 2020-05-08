@@ -41,8 +41,11 @@ class Model():
             self.load_networks(opt.loadepoch)
         self.print_networks()
 
-    def update_learning_rate(self):
-        self.scheduler.step()
+    def update_learning_rate(self, opt):
+        if opt.lr_policy == 'step':
+            self.scheduler.step()
+        elif opt.lr_policy == 'plateau':
+            self.scheduler.step(self.loss)
         lr = self.optimizer.param_groups[0]['lr']
         print('learning rate = %.7f' % lr)
 
