@@ -4,6 +4,7 @@ from models import networks
 from tensorboardX import SummaryWriter
 import numpy as np
 from torch.optim import lr_scheduler
+from apex import amp
 class Model():
     def __init__(self, opt):
         self.writer = SummaryWriter(opt.visual_module + opt.model + '/')
@@ -14,6 +15,8 @@ class Model():
         self.save_dir = opt.checkpoints_dir
         self.model_name = opt.model
         self.net = networks.definenet(opt).to(self.device)
+        self.fp16 = opt.fp16
+        self.opt_level = opt.opt_level
         if self.isTrain:
             self.criterion = networks.Criterion().to(self.device)
             optimizers = {"SGD": torch.optim.SGD(self.net.parameters(),
@@ -26,6 +29,8 @@ class Model():
                           'ADAM': torch.optim.Adam(self.net.parameters(),
                                                lr=opt.lr, betas=(0.9, 0.99))}
             self.optimizer = optimizers[opt.optimizer]
+            if self.fp16:
+                self.net, self.optimizer =amp.initialize(self.net, self.optimizer, opt_level=self.opt_level)
 
     def initialize(self, opt):
 
@@ -59,10 +64,19 @@ class Model():
     def backward(self):
         self.loss = self.criterion(self.predict,self.labels)
         self.loss.backward()
+
+    def fpbackward(self):
+        self.loss = self.criterion(self.predict, self.labels)
+        with amp.scale_loss(self.loss, self.optimizer) as scaled_loss:
+            scaled_loss.backward()
+
     def optimize_parameters(self):
         self.optimizer.zero_grad()
         self.forward()
-        self.backward()
+        if self.fp16:
+            self.fpbackward()
+        else:
+            self.backward()
         self.optimizer.step()
 
     def eval(self):

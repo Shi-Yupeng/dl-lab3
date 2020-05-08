@@ -77,6 +77,41 @@ class ResNet(nn.Module):
         return out
 
 
+class ResNet34(nn.Module):
+    def __init__(self, block=BasicBlock, num_blocks=[3, 4, 6, 3], num_classes=10):
+        super(ResNet, self).__init__()
+        self.in_channel = 64
+        self.conv1 = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.MaxPool2d(kernel_size=3, stride=1, padding=1),
+        )
+        self.layer1 = self._make_layer(block, 64, num_blocks[0], stride=1)
+        self.layer2 = self._make_layer(block, 128, num_blocks[1], stride=2)
+        self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
+        self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(512 * 1 * 1, num_classes)
+
+    def _make_layer(self, block, out_channel, num_blocks, stride):
+        strides = [stride] + [1] * (num_blocks - 1)
+        layers = []
+        for stride in strides:
+            layers.append(block(self.in_channel, out_channel, stride))
+            self.in_channel = out_channel
+        return nn.Sequential(*layers)
+
+    def forward(self, x):
+        out = self.conv1(x)
+        out = self.layer1(out)
+        out = self.layer2(out)
+        out = self.layer3(out)
+        out = self.layer4(out)
+        out = self.avgpool(out)
+        out = out.view(out.size(0), 512 * 1 * 1)
+        out = self.fc(out)
+        return out
+
+
 class SEBlock(nn.Module):
     def __init__(self, channel, reduction=16):
         super(SEBlock, self).__init__()
@@ -170,6 +205,40 @@ class SEResNet(nn.Module):
         out = self.fc(out)
         return out
 
+
+class SEResNet34(nn.Module):
+    def __init__(self, block=SEBasicBlock, num_blocks=[3, 4, 6, 3], num_classes=10):
+        super(SEResNet, self).__init__()
+        self.in_channel = 64
+        self.conv1 = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.MaxPool2d(kernel_size=3, stride=1, padding=1),
+        )
+        self.layer1 = self._make_layer(block, 64, num_blocks[0], stride=1)
+        self.layer2 = self._make_layer(block, 128, num_blocks[1], stride=2)
+        self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
+        self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(512 * 1 * 1, num_classes)
+
+    def _make_layer(self, block, out_channel, num_blocks, stride):
+        strides = [stride] + [1] * (num_blocks - 1)
+        layers = []
+        for stride in strides:
+            layers.append(block(self.in_channel, out_channel, stride))
+            self.in_channel = out_channel
+        return nn.Sequential(*layers)
+
+    def forward(self, x):
+        out = self.conv1(x)
+        out = self.layer1(out)
+        out = self.layer2(out)
+        out = self.layer3(out)
+        out = self.layer4(out)
+        out = self.avgpool(out)
+        out = out.view(out.size(0), 512 * 1 * 1)
+        out = self.fc(out)
+        return out
 
 
 # VGG19网络

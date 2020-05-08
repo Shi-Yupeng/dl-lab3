@@ -18,5 +18,9 @@ class TrainOptions(BaseOptions):
                             help='可视化目录')
         parser.add_argument('--optimizer', type=str, default='ADAM',
                             help='优化器 [SGD,SGD-Momentum,RMSProp,ADAM]')
+        parser.add_argument('--fp16', action='store_true',
+                            help='是否使用16-bit替代32-bit')
+        parser.add_argument('--opt_level', type=str, default='O1',
+                            help='半精度模式 [O0, O1, O2, 03]')
         self.isTrain = True
         return parser
